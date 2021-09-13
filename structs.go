@@ -1,12 +1,11 @@
 package main
 
 type BME280 struct {
-	name        string
-	loc         string
-	timestamp   int
-	payload     string
-	temperature float32
-	humidity    float32
-	pressure    float32
-	rssi        int
+	Name        string  `json:"name"`
+	Loc         string  `json:"loc"`
+	Timestamp   int     `json:"time"`
+	Temperature float32 `json:"temperature"`
+	Humidity    float32 `json:"humidity"`
+	Pressure    float32 `json:"pressure"`
+	RSSI        int     `json:"RSSI"`
 }
