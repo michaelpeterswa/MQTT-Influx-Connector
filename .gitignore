@@ -15,4 +15,4 @@
 # vendor/
 
 # michaelpeterswa specific
-.env
+config.yaml

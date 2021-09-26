@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"log"
-	"os"
 	"time"
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
@@ -16,25 +15,28 @@ type InfluxConn struct {
 func initInflux() (conn *InfluxConn) {
 
 	log.Println("Creating InfluxDB v2 connection...")
-	client := influxdb2.NewClient(os.Getenv("INFLUX_ADDRESS"), os.Getenv("INFLUX_TOKEN"))
+	client := influxdb2.NewClient(settings.InfluxAddress, settings.InfluxToken)
 	conn = &InfluxConn{client}
 	return conn
 
 }
 
 func getOrganization() string {
-	return os.Getenv("INFLUX_ORGANIZATION")
+	return settings.InfluxOrganization
 }
 
 func getBucket() string {
-	return os.Getenv("INFLUX_BUCKET")
+	return settings.InfluxBucket
 }
 
-func (conn *InfluxConn) writeSensorData(reading BME280) {
-	p := influxdb2.NewPointWithMeasurement("bme280").
+func (conn *InfluxConn) writeBME280SensorData(reading BME280, st SubTopic) {
+	p := influxdb2.NewPointWithMeasurement(settings.InfluxMeasurement).
 		AddTag("feeder", "MQTT-Influx-Connector").
-		AddTag("loc", reading.Loc).
-		AddTag("name", reading.Name).
+		AddTag("type", st.Type).
+		AddTag("location", st.Location).
+		AddTag("room", st.Room).
+		AddTag("name", st.Name).
+		AddTag("field", st.Field).
 		AddField("temperature", reading.Temperature).
 		AddField("humidity", reading.Humidity).
 		AddField("pressure", reading.Pressure).

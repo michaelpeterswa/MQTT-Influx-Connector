@@ -1,0 +1,20 @@
+---
+influx-address: ""
+influx-token: ""
+influx-organization: ""
+influx-bucket: ""
+influx-measurement: ""
+
+mqtt-address: ""
+mqtt-client-id: ""
+mqtt-username: ""
+mqtt-password: ""
+
+mqtt-topics:
+  - topic:
+      type: ""
+      location: ""
+      room: ""
+      name: ""
+      field: ""
+    qos: 0
