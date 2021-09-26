@@ -18,4 +18,3 @@ mqtt-topics:
       name: ""
       field: ""
     qos: 0
-    
