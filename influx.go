@@ -57,6 +57,7 @@ func (conn *InfluxConn) writeTSL2561SensorData(reading TSL2561, st SubTopic) {
 		AddTag("name", st.Name).
 		AddTag("field", st.Field).
 		AddField("lux", reading.Lux).
+		AddField("rssi", reading.RSSI).
 		SetTime(time.Unix(int64(reading.Timestamp), 0))
 
 	write := conn.client.WriteAPIBlocking(getOrganization(), getBucket())
