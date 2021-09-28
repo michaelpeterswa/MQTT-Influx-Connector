@@ -26,6 +26,14 @@ func onMessageReceived(influxConn *InfluxConn) func(client MQTT.Client, message 
 			} else {
 				influxConn.writeBME280SensorData(reading, st)
 			}
+		case "tsl2561":
+			var reading TSL2561
+			err := json.Unmarshal(message.Payload(), &reading)
+			if err != nil {
+				log.Println(err)
+			} else {
+				influxConn.writeTSL2561SensorData(reading, st)
+			}
 		default:
 			fmt.Println("unknown")
 		}

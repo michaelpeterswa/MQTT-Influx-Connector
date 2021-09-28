@@ -47,3 +47,19 @@ func (conn *InfluxConn) writeBME280SensorData(reading BME280, st SubTopic) {
 	write.WritePoint(context.Background(), p)
 
 }
+
+func (conn *InfluxConn) writeTSL2561SensorData(reading TSL2561, st SubTopic) {
+	p := influxdb2.NewPointWithMeasurement(settings.InfluxMeasurement).
+		AddTag("feeder", "MQTT-Influx-Connector").
+		AddTag("type", st.Type).
+		AddTag("location", st.Location).
+		AddTag("room", st.Room).
+		AddTag("name", st.Name).
+		AddTag("field", st.Field).
+		AddField("lux", reading.Lux).
+		SetTime(time.Unix(int64(reading.Timestamp), 0))
+
+	write := conn.client.WriteAPIBlocking(getOrganization(), getBucket())
+	write.WritePoint(context.Background(), p)
+
+}

@@ -37,3 +37,11 @@ type BME280 struct {
 	Pressure    float32 `json:"pressure"`
 	RSSI        int     `json:"RSSI"`
 }
+
+type TSL2561 struct {
+	Name      string  `json:"name"`
+	Loc       string  `json:"loc"`
+	Timestamp int     `json:"time"`
+	Lux       float32 `json:"lux"`
+	RSSI      int     `json:"RSSI"`
+}
