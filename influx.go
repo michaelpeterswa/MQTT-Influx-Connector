@@ -64,3 +64,31 @@ func (conn *InfluxConn) writeTSL2561SensorData(reading TSL2561, st SubTopic) {
 	write.WritePoint(context.Background(), p)
 
 }
+
+func (conn *InfluxConn) writePMSA003ISensorData(reading PMSA003I, st SubTopic) {
+	p := influxdb2.NewPointWithMeasurement(settings.InfluxMeasurement).
+		AddTag("feeder", "MQTT-Influx-Connector").
+		AddTag("type", st.Type).
+		AddTag("location", st.Location).
+		AddTag("room", st.Room).
+		AddTag("name", st.Name).
+		AddTag("field", st.Field).
+		AddField("pm10s", reading.Pm10S).
+		AddField("pm25s", reading.Pm25S).
+		AddField("pm100s", reading.Pm100S).
+		AddField("pm10e", reading.Pm10E).
+		AddField("pm25e", reading.Pm25E).
+		AddField("pm100e", reading.Pm100E).
+		AddField("p03um", reading.P03Um).
+		AddField("p05um", reading.P05Um).
+		AddField("p10um", reading.P10Um).
+		AddField("p25um", reading.P25Um).
+		AddField("p50um", reading.P50Um).
+		AddField("p100um", reading.P100Um).
+		AddField("rssi", reading.RSSI).
+		SetTime(time.Unix(int64(reading.Timestamp), 0))
+
+	write := conn.client.WriteAPIBlocking(getOrganization(), getBucket())
+	write.WritePoint(context.Background(), p)
+
+}

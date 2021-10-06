@@ -45,3 +45,22 @@ type TSL2561 struct {
 	Lux       float32 `json:"lux"`
 	RSSI      int     `json:"RSSI"`
 }
+
+type PMSA003I struct {
+	Name      string `json:"name"`
+	Loc       string `json:"loc"`
+	Timestamp int    `json:"time"`
+	Pm10S     int    `json:"pm10s"`
+	Pm25S     int    `json:"pm25s"`
+	Pm100S    int    `json:"pm100s"`
+	Pm10E     int    `json:"pm10e"`
+	Pm25E     int    `json:"pm25e"`
+	Pm100E    int    `json:"pm100e"`
+	P03Um     int    `json:"p03um"`
+	P05Um     int    `json:"p05um"`
+	P10Um     int    `json:"p10um"`
+	P25Um     int    `json:"p25um"`
+	P50Um     int    `json:"p50um"`
+	P100Um    int    `json:"p100um"`
+	RSSI      int    `json:"RSSI"`
+}
