@@ -43,6 +43,11 @@ func (conn *InfluxConn) writeBME280SensorData(reading BME280, st SubTopic) {
 		AddField("rssi", reading.RSSI).
 		SetTime(time.Unix(int64(reading.Timestamp), 0))
 
+	// support for the optional voltage reading... only if populated
+	if reading.Voltage != 0 {
+		p.AddField("voltage", reading.Voltage)
+	}
+
 	write := conn.client.WriteAPIBlocking(getOrganization(), getBucket())
 	write.WritePoint(context.Background(), p)
 

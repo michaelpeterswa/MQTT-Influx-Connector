@@ -1,4 +1,4 @@
-all: build
+all: build publish
 
 build:
 	docker build -t michaelpeterswa/mqtt-influx-connector .

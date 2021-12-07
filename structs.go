@@ -36,6 +36,7 @@ type BME280 struct {
 	Humidity    float32 `json:"humidity"`
 	Pressure    float32 `json:"pressure"`
 	RSSI        int     `json:"RSSI"`
+	Voltage     float32 `json:"voltage,omitempty"`
 }
 
 type TSL2561 struct {
