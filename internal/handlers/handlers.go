@@ -14,6 +14,8 @@ func OnMessageReceived(influxConn *influx.InfluxConn) func(client MQTT.Client, m
 	return func(client MQTT.Client, message MQTT.Message) {
 		st := helpers.GetSubTopicFromString(message.Topic())
 
+		influxConn.WriteMessageReceived()
+
 		switch v := st.Name; v {
 		case "bme280":
 			var reading structs.BME280
