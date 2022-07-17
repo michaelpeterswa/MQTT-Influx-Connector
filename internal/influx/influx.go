@@ -21,7 +21,7 @@ type InfluxConn struct {
 func InitInflux(settings *structs.MQTTInfluxConnectorSettings) *InfluxConn {
 	logger, err := zap.NewProduction()
 	if err != nil {
-		log.Fatalf("unable to acquire zap logger: %w\n", err)
+		log.Fatalf("unable to acquire zap logger: %s\n", err.Error())
 	}
 
 	log.Println("Creating InfluxDB v2 connection...")
