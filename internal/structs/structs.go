@@ -1,4 +1,4 @@
-package main
+package structs
 
 type MQTTInfluxConnectorSettings struct {
 	InfluxAddress      string `yaml:"influx-address"`

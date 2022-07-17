@@ -1,20 +1,22 @@
-package main
+package helpers_test
 
 import (
 	"testing"
 
+	"github.com/michaelpeterswa/MQTT-Influx-Connector/internal/helpers"
+	"github.com/michaelpeterswa/MQTT-Influx-Connector/internal/structs"
 	"github.com/stretchr/testify/assert"
 )
 
 func TestBuildTopic(t *testing.T) {
 	tests := []struct {
 		name  string
-		st    SubTopic
+		st    structs.SubTopic
 		topic string
 	}{
 		{
 			name: "testing buildTopic() basic",
-			st: SubTopic{
+			st: structs.SubTopic{
 				Type:     "a",
 				Location: "b",
 				Room:     "c",
@@ -27,7 +29,7 @@ func TestBuildTopic(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			assert.Equal(t, tc.topic, buildTopic(tc.st))
+			assert.Equal(t, tc.topic, helpers.BuildTopic(tc.st))
 		})
 	}
 }
@@ -36,12 +38,12 @@ func TestGetSubTopicFromString(t *testing.T) {
 	tests := []struct {
 		name string
 		str  string
-		st   SubTopic
+		st   structs.SubTopic
 	}{
 		{
 			name: "testing buildTopic() basic",
 			str:  "a/b/c/d/e",
-			st: SubTopic{
+			st: structs.SubTopic{
 				Type:     "a",
 				Location: "b",
 				Room:     "c",
@@ -53,7 +55,7 @@ func TestGetSubTopicFromString(t *testing.T) {
 
 	for _, tc := range tests {
 		t.Run(tc.name, func(t *testing.T) {
-			assert.Equal(t, tc.st, getSubTopicFromString(tc.str))
+			assert.Equal(t, tc.st, helpers.GetSubTopicFromString(tc.str))
 		})
 	}
 }

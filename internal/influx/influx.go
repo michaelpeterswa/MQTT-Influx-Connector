@@ -1,4 +1,4 @@
-package main
+package influx
 
 import (
 	"context"
@@ -6,31 +6,41 @@ import (
 	"time"
 
 	influxdb2 "github.com/influxdata/influxdb-client-go/v2"
+	"github.com/michaelpeterswa/MQTT-Influx-Connector/internal/structs"
+	"go.uber.org/zap"
 )
 
 type InfluxConn struct {
-	client influxdb2.Client
+	client       influxdb2.Client
+	Logger       *zap.Logger
+	measurement  string
+	bucket       string
+	organization string
 }
 
-func initInflux() (conn *InfluxConn) {
+func InitInflux(settings *structs.MQTTInfluxConnectorSettings) *InfluxConn {
+	logger, err := zap.NewProduction()
+	if err != nil {
+		log.Fatalf("unable to acquire zap logger: %w\n", err)
+	}
 
 	log.Println("Creating InfluxDB v2 connection...")
 	client := influxdb2.NewClient(settings.InfluxAddress, settings.InfluxToken)
-	conn = &InfluxConn{client}
+	conn := &InfluxConn{client: client, Logger: logger, measurement: settings.InfluxMeasurement, bucket: settings.InfluxBucket, organization: settings.InfluxOrganization}
 	return conn
 
 }
 
-func getOrganization() string {
-	return settings.InfluxOrganization
+func (i *InfluxConn) GetOrganization() string {
+	return i.organization
 }
 
-func getBucket() string {
-	return settings.InfluxBucket
+func (i *InfluxConn) GetBucket() string {
+	return i.bucket
 }
 
-func (conn *InfluxConn) writeBME280SensorData(reading BME280, st SubTopic) {
-	p := influxdb2.NewPointWithMeasurement(settings.InfluxMeasurement).
+func (conn *InfluxConn) WriteBME280SensorData(reading structs.BME280, st structs.SubTopic) {
+	p := influxdb2.NewPointWithMeasurement(conn.measurement).
 		AddTag("feeder", "MQTT-Influx-Connector").
 		AddTag("type", st.Type).
 		AddTag("location", st.Location).
@@ -48,13 +58,13 @@ func (conn *InfluxConn) writeBME280SensorData(reading BME280, st SubTopic) {
 		p.AddField("voltage", reading.Voltage)
 	}
 
-	write := conn.client.WriteAPIBlocking(getOrganization(), getBucket())
+	write := conn.client.WriteAPIBlocking(conn.GetOrganization(), conn.GetBucket())
 	write.WritePoint(context.Background(), p)
 
 }
 
-func (conn *InfluxConn) writeTSL2561SensorData(reading TSL2561, st SubTopic) {
-	p := influxdb2.NewPointWithMeasurement(settings.InfluxMeasurement).
+func (conn *InfluxConn) WriteTSL2561SensorData(reading structs.TSL2561, st structs.SubTopic) {
+	p := influxdb2.NewPointWithMeasurement(conn.measurement).
 		AddTag("feeder", "MQTT-Influx-Connector").
 		AddTag("type", st.Type).
 		AddTag("location", st.Location).
@@ -65,13 +75,13 @@ func (conn *InfluxConn) writeTSL2561SensorData(reading TSL2561, st SubTopic) {
 		AddField("rssi", reading.RSSI).
 		SetTime(time.Unix(int64(reading.Timestamp), 0))
 
-	write := conn.client.WriteAPIBlocking(getOrganization(), getBucket())
+	write := conn.client.WriteAPIBlocking(conn.GetOrganization(), conn.GetBucket())
 	write.WritePoint(context.Background(), p)
 
 }
 
-func (conn *InfluxConn) writePMSA003ISensorData(reading PMSA003I, st SubTopic) {
-	p := influxdb2.NewPointWithMeasurement(settings.InfluxMeasurement).
+func (conn *InfluxConn) WritePMSA003ISensorData(reading structs.PMSA003I, st structs.SubTopic) {
+	p := influxdb2.NewPointWithMeasurement(conn.measurement).
 		AddTag("feeder", "MQTT-Influx-Connector").
 		AddTag("type", st.Type).
 		AddTag("location", st.Location).
@@ -93,7 +103,17 @@ func (conn *InfluxConn) writePMSA003ISensorData(reading PMSA003I, st SubTopic) {
 		AddField("rssi", reading.RSSI).
 		SetTime(time.Unix(int64(reading.Timestamp), 0))
 
-	write := conn.client.WriteAPIBlocking(getOrganization(), getBucket())
+	write := conn.client.WriteAPIBlocking(conn.GetOrganization(), conn.GetBucket())
 	write.WritePoint(context.Background(), p)
 
+}
+
+func (conn *InfluxConn) WriteMessageReceived() {
+	p := influxdb2.NewPointWithMeasurement(conn.measurement).
+		AddTag("message", "received").
+		AddField("hit", 1).
+		SetTime(time.Now())
+
+	write := conn.client.WriteAPIBlocking(conn.GetOrganization(), conn.GetBucket())
+	write.WritePoint(context.Background(), p)
 }

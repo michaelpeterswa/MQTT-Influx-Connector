@@ -1,9 +1,8 @@
-package main
+package mqtt
 
 import (
 	"crypto/tls"
 	"flag"
-	"fmt"
 	"os"
 	"os/signal"
 	"strconv"
@@ -11,21 +10,26 @@ import (
 	"time"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
+	"github.com/michaelpeterswa/MQTT-Influx-Connector/internal/handlers"
+	"github.com/michaelpeterswa/MQTT-Influx-Connector/internal/helpers"
+	"github.com/michaelpeterswa/MQTT-Influx-Connector/internal/influx"
+	"github.com/michaelpeterswa/MQTT-Influx-Connector/internal/structs"
+	"go.uber.org/zap"
 )
 
 type MqttConnection struct {
 	MQTTClient MQTT.Client
 }
 
-func topicsToMapStringByte(t []Topic) map[string]byte {
+func topicsToMapStringByte(t []structs.Topic) map[string]byte {
 	m := make(map[string]byte)
 	for _, topic := range t {
-		m[buildTopic(topic.Topic)] = topic.QoS
+		m[helpers.BuildTopic(topic.Topic)] = topic.QoS
 	}
 	return m
 }
 
-func initMQTT(iConn *InfluxConn) {
+func InitMQTT(iConn *influx.InfluxConn, settings *structs.MQTTInfluxConnectorSettings) {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
@@ -50,16 +54,16 @@ func initMQTT(iConn *InfluxConn) {
 	topics := topicsToMapStringByte(settings.MQTTTopics)
 
 	connOpts.OnConnect = func(c MQTT.Client) {
-		if token := c.SubscribeMultiple(topics, onMessageReceived(iConn)); token.Wait() && token.Error() != nil {
-			panic(token.Error())
+		if token := c.SubscribeMultiple(topics, handlers.OnMessageReceived(iConn)); token.Wait() && token.Error() != nil {
+			iConn.Logger.Fatal("couldn't subscribe multiple", zap.Error(token.Error()))
 		}
 	}
 
 	client := MQTT.NewClient(connOpts)
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
-		panic(token.Error())
+		iConn.Logger.Fatal("couldn't connect to mqtt server", zap.Error(token.Error()))
 	} else {
-		fmt.Printf("Connected to %s\n", *server)
+		iConn.Logger.Info("connected to mqtt server", zap.String("server", *server))
 	}
 
 	<-c
