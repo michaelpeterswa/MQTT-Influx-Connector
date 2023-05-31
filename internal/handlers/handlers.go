@@ -33,6 +33,14 @@ func OnMessageReceived(influxConn *influx.InfluxConn) func(client MQTT.Client, m
 			} else {
 				influxConn.WriteTSL2561SensorData(reading, st)
 			}
+		case "tsl2591":
+			var reading structs.TSL2561
+			err := json.Unmarshal(message.Payload(), &reading)
+			if err != nil {
+				influxConn.Logger.Error("failed to unmarshal payload", zap.String("sensor", st.Name))
+			} else {
+				influxConn.WriteTSL2561SensorData(reading, st)
+			}
 		case "pmsa003i":
 			var reading structs.PMSA003I
 			err := json.Unmarshal(message.Payload(), &reading)
