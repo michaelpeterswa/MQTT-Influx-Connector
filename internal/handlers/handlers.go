@@ -7,6 +7,7 @@ import (
 	"github.com/michaelpeterswa/MQTT-Influx-Connector/internal/helpers"
 	"github.com/michaelpeterswa/MQTT-Influx-Connector/internal/influx"
 	"github.com/michaelpeterswa/MQTT-Influx-Connector/internal/structs"
+	gorenogymodbus "github.com/michaelpeterswa/go-renogy-modbus"
 	"go.uber.org/zap"
 )
 
@@ -48,6 +49,14 @@ func OnMessageReceived(influxConn *influx.InfluxConn) func(client MQTT.Client, m
 				influxConn.Logger.Error("failed to unmarshal payload", zap.String("sensor", st.Name))
 			} else {
 				influxConn.WritePMSA003ISensorData(reading, st)
+			}
+		case "renogy-charge-controller":
+			var reading gorenogymodbus.DynamicControllerInformation
+			err := json.Unmarshal(message.Payload(), &reading)
+			if err != nil {
+				influxConn.Logger.Error("failed to unmarshal payload", zap.String("sensor", st.Name))
+			} else {
+				influxConn.WriteRenogyChargeControllerSensorData(reading, st)
 			}
 		default:
 			influxConn.Logger.Warn("unknown sensor type", zap.String("sensor", st.Name))
