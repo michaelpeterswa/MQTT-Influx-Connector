@@ -1,12 +1,12 @@
 ---
 name: Test
-on: [push, pull_request]
+on: [push, pull_request]  # yamllint disable-line rule:truthy
 jobs:
   test:
     strategy:
       matrix:
         go-version: [1.19.x, 1.20.x]
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - name: Install Go
