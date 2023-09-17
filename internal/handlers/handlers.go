@@ -39,6 +39,10 @@ func OnMessageReceived(influxConn *influx.InfluxConn, timescaleConn *timescale.T
 				influxConn.Logger.Error("failed to unmarshal payload", zap.String("sensor", st.Name))
 			} else {
 				influxConn.WriteTSL2561SensorData(reading, st)
+				err := timescaleConn.WriteTSL2561SensorData(context.TODO(), reading, st)
+				if err != nil {
+					influxConn.Logger.Error("failed to write to timescale", zap.Error(err))
+				}
 			}
 		case "tsl2591":
 			var reading structs.TSL2561
@@ -47,6 +51,10 @@ func OnMessageReceived(influxConn *influx.InfluxConn, timescaleConn *timescale.T
 				influxConn.Logger.Error("failed to unmarshal payload", zap.String("sensor", st.Name))
 			} else {
 				influxConn.WriteTSL2561SensorData(reading, st)
+				err := timescaleConn.WriteTSL2561SensorData(context.TODO(), reading, st)
+				if err != nil {
+					influxConn.Logger.Error("failed to write to timescale", zap.Error(err))
+				}
 			}
 		case "pmsa003i":
 			var reading structs.PMSA003I
@@ -55,6 +63,10 @@ func OnMessageReceived(influxConn *influx.InfluxConn, timescaleConn *timescale.T
 				influxConn.Logger.Error("failed to unmarshal payload", zap.String("sensor", st.Name))
 			} else {
 				influxConn.WritePMSA003ISensorData(reading, st)
+				err := timescaleConn.WritePMSA003ISensorData(context.TODO(), reading, st)
+				if err != nil {
+					influxConn.Logger.Error("failed to write to timescale", zap.Error(err))
+				}
 			}
 		case "renogy-charge-controller":
 			var reading gorenogymodbus.DynamicControllerInformation
@@ -63,6 +75,10 @@ func OnMessageReceived(influxConn *influx.InfluxConn, timescaleConn *timescale.T
 				influxConn.Logger.Error("failed to unmarshal payload", zap.String("sensor", st.Name))
 			} else {
 				influxConn.WriteRenogyChargeControllerSensorData(reading, st)
+				err := timescaleConn.WriteRenogyChargeControllerSensorData(context.TODO(), reading, st)
+				if err != nil {
+					influxConn.Logger.Error("failed to write to timescale", zap.Error(err))
+				}
 			}
 		default:
 			influxConn.Logger.Warn("unknown sensor type", zap.String("sensor", st.Name))

@@ -164,14 +164,3 @@ func (conn *InfluxConn) WriteRenogyChargeControllerSensorData(reading gorenogymo
 	write.WritePoint(context.Background(), p)
 
 }
-
-// type DynamicControllerInformation struct {
-// 	TotalChargingAmpHours               decimal.Decimal `json:"total_charging_amp_hours"`                // 0x118-119
-// 	TotalDischargingAmpHours            decimal.Decimal `json:"total_discharging_amp_hours"`             // 0x11A-11B
-// 	CumulativePowerGeneration           decimal.Decimal `json:"cumulative_power_generation"`             // 0x11C-11D
-// 	CumulativePowerConsumption          decimal.Decimal `json:"cumulative_power_consumption"`            // 0x11E-11F
-// 	StreetLightStatus                   bool            `json:"street_light_status"`                     // 0x120 (eight higher bits)
-// 	StreetLightBrightness               int             `json:"street_light_brightness"`                 // 0x120 (eight higher bits)
-// 	ChargingState                       string          `json:"charging_state"`                          // 0x120 (eight lower bits)
-// 	ControllerFaults                    []string        `json:"controller_faults"`                       // 0x121-122
-// }

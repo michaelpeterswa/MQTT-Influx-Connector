@@ -1,4 +1,4 @@
-all: migrate-down migrate-up
+all: migrate-up
 
 .PHONY: migrate-up
 migrate-up:
