@@ -13,6 +13,8 @@ type MQTTInfluxConnectorSettings struct {
 	MQTTPassword string `yaml:"mqtt-password"`
 
 	MQTTTopics []Topic `yaml:"mqtt-topics"`
+
+	TimescaleAddress string `yaml:"timescale-address"`
 }
 
 type Topic struct {

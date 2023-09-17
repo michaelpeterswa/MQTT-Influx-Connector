@@ -1,7 +1,11 @@
-all: build publish
+all: migrate-down migrate-up
 
-build:
-	docker build -t michaelpeterswa/mqtt-influx-connector .
+.PHONY: migrate-up
+migrate-up:
+	docker run -v ./docker/timescale/migrations:/migrations --network host migrate/migrate \
+    -path=/migrations/ -database "postgres://postgres:root@<timescale address>/postgres?sslmode=disable" up
 
-publish:
-	docker push michaelpeterswa/mqtt-influx-connector
+.PHONY: migrate-down
+migrate-down:
+	docker run -v ./docker/timescale/migrations:/migrations --network host migrate/migrate \
+    -path=/migrations/ -database "postgres://postgres:root@<timescale address>/postgres?sslmode=disable" down -all
