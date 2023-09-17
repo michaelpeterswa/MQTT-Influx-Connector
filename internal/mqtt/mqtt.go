@@ -2,18 +2,16 @@ package mqtt
 
 import (
 	"crypto/tls"
-	"flag"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
-	"time"
 
 	MQTT "github.com/eclipse/paho.mqtt.golang"
 	"github.com/michaelpeterswa/MQTT-Influx-Connector/internal/handlers"
 	"github.com/michaelpeterswa/MQTT-Influx-Connector/internal/helpers"
 	"github.com/michaelpeterswa/MQTT-Influx-Connector/internal/influx"
 	"github.com/michaelpeterswa/MQTT-Influx-Connector/internal/structs"
+	"github.com/michaelpeterswa/MQTT-Influx-Connector/internal/timescale"
 	"go.uber.org/zap"
 )
 
@@ -29,32 +27,25 @@ func topicsToMapStringByte(t []structs.Topic) map[string]byte {
 	return m
 }
 
-func InitMQTT(iConn *influx.InfluxConn, settings *structs.MQTTInfluxConnectorSettings) {
+func InitMQTT(iConn *influx.InfluxConn, tConn *timescale.TimescaleConn, settings *structs.MQTTInfluxConnectorSettings) {
 	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 
-	hostname, _ := os.Hostname()
-
-	server := flag.String("server", settings.MQTTAddress, "The full url of the MQTT server to connect to ex: tcp://127.0.0.1:1883")
-	clientid := flag.String("clientid", hostname+strconv.Itoa(time.Now().Second()), "A clientid for the connection")
-	username := flag.String("username", settings.MQTTPassword, "A username to authenticate to the MQTT server")
-	password := flag.String("password", settings.MQTTPassword, "Password to match username")
-	flag.Parse()
-
-	connOpts := MQTT.NewClientOptions().AddBroker(*server).SetClientID(*clientid).SetCleanSession(true)
-	if *username != "" {
-		connOpts.SetUsername(*username)
-		if *password != "" {
-			connOpts.SetPassword(*password)
+	connOpts := MQTT.NewClientOptions().AddBroker(settings.MQTTAddress).SetClientID(settings.MQTTClientId).SetCleanSession(true)
+	if settings.MQTTUsername != "" {
+		connOpts.SetUsername(settings.MQTTUsername)
+		if settings.MQTTPassword != "" {
+			connOpts.SetPassword(settings.MQTTPassword)
 		}
 	}
+
 	tlsConfig := &tls.Config{InsecureSkipVerify: true, ClientAuth: tls.NoClientCert}
 	connOpts.SetTLSConfig(tlsConfig)
 
 	topics := topicsToMapStringByte(settings.MQTTTopics)
 
 	connOpts.OnConnect = func(c MQTT.Client) {
-		if token := c.SubscribeMultiple(topics, handlers.OnMessageReceived(iConn)); token.Wait() && token.Error() != nil {
+		if token := c.SubscribeMultiple(topics, handlers.OnMessageReceived(iConn, tConn)); token.Wait() && token.Error() != nil {
 			iConn.Logger.Fatal("couldn't subscribe multiple", zap.Error(token.Error()))
 		}
 	}
@@ -63,7 +54,7 @@ func InitMQTT(iConn *influx.InfluxConn, settings *structs.MQTTInfluxConnectorSet
 	if token := client.Connect(); token.Wait() && token.Error() != nil {
 		iConn.Logger.Fatal("couldn't connect to mqtt server", zap.Error(token.Error()))
 	} else {
-		iConn.Logger.Info("connected to mqtt server", zap.String("server", *server))
+		iConn.Logger.Info("connected to mqtt server", zap.String("server", settings.MQTTAddress))
 	}
 
 	<-c

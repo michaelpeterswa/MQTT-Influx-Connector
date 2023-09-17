@@ -25,7 +25,6 @@ func InitInflux(settings *structs.MQTTInfluxConnectorSettings) *InfluxConn {
 		log.Fatalf("unable to acquire zap logger: %s\n", err.Error())
 	}
 
-	log.Println("Creating InfluxDB v2 connection...")
 	client := influxdb2.NewClient(settings.InfluxAddress, settings.InfluxToken)
 	conn := &InfluxConn{client: client, Logger: logger, measurement: settings.InfluxMeasurement, bucket: settings.InfluxBucket, organization: settings.InfluxOrganization}
 	return conn
