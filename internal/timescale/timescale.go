@@ -47,7 +47,7 @@ func (t *TimescaleConn) WriteBME280SensorData(ctx context.Context, reading struc
 	_, err := t.Conn.Exec(
 		ctx,
 		writeBME280SQL,
-		time.Now(),
+		time.Unix(int64(reading.Timestamp), 0),
 		st.Type,
 		st.Location,
 		st.Room,
@@ -70,7 +70,7 @@ func (t *TimescaleConn) WriteTSL2561SensorData(ctx context.Context, reading stru
 	_, err := t.Conn.Exec(
 		ctx,
 		writeTSL2561SQL,
-		time.Now(),
+		time.Unix(int64(reading.Timestamp), 0),
 		st.Type,
 		st.Location,
 		st.Room,
@@ -90,7 +90,7 @@ func (t *TimescaleConn) WritePMSA003ISensorData(ctx context.Context, reading str
 	_, err := t.Conn.Exec(
 		ctx,
 		writePMSA003ISQL,
-		time.Now(),
+		time.Unix(int64(reading.Timestamp), 0),
 		st.Type,
 		st.Location,
 		st.Room,
