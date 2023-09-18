@@ -7,4 +7,4 @@ GRANT SELECT ON sensors.tsl2561 TO grafana;
 GRANT SELECT ON sensors.pmsa003i TO grafana;
 GRANT SELECT ON sensors.renogychargecontroller TO grafana;
 
--- ALTER ROLE grafana SET search_path = 'sensors';
+-- ALTER ROLE grafana SET search_path to sensors,public;
