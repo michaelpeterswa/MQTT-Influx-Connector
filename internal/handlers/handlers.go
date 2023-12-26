@@ -17,8 +17,6 @@ func OnMessageReceived(influxConn *influx.InfluxConn, timescaleConn *timescale.T
 	return func(client MQTT.Client, message MQTT.Message) {
 		st := helpers.GetSubTopicFromString(message.Topic())
 
-		influxConn.WriteMessageReceived()
-
 		switch v := st.Name; v {
 		case "bme280":
 			var reading structs.BME280
@@ -26,7 +24,6 @@ func OnMessageReceived(influxConn *influx.InfluxConn, timescaleConn *timescale.T
 			if err != nil {
 				influxConn.Logger.Error("failed to unmarshal payload", zap.String("sensor", st.Name))
 			} else {
-				influxConn.WriteBME280SensorData(reading, st)
 				err := timescaleConn.WriteBME280SensorData(context.TODO(), reading, st)
 				if err != nil {
 					influxConn.Logger.Error("failed to write to timescale", zap.Error(err))
@@ -38,7 +35,6 @@ func OnMessageReceived(influxConn *influx.InfluxConn, timescaleConn *timescale.T
 			if err != nil {
 				influxConn.Logger.Error("failed to unmarshal payload", zap.String("sensor", st.Name))
 			} else {
-				influxConn.WriteTSL2561SensorData(reading, st)
 				err := timescaleConn.WriteTSL2561SensorData(context.TODO(), reading, st)
 				if err != nil {
 					influxConn.Logger.Error("failed to write to timescale", zap.Error(err))
@@ -50,7 +46,6 @@ func OnMessageReceived(influxConn *influx.InfluxConn, timescaleConn *timescale.T
 			if err != nil {
 				influxConn.Logger.Error("failed to unmarshal payload", zap.String("sensor", st.Name))
 			} else {
-				influxConn.WriteTSL2561SensorData(reading, st)
 				err := timescaleConn.WriteTSL2561SensorData(context.TODO(), reading, st)
 				if err != nil {
 					influxConn.Logger.Error("failed to write to timescale", zap.Error(err))
@@ -62,7 +57,6 @@ func OnMessageReceived(influxConn *influx.InfluxConn, timescaleConn *timescale.T
 			if err != nil {
 				influxConn.Logger.Error("failed to unmarshal payload", zap.String("sensor", st.Name))
 			} else {
-				influxConn.WritePMSA003ISensorData(reading, st)
 				err := timescaleConn.WritePMSA003ISensorData(context.TODO(), reading, st)
 				if err != nil {
 					influxConn.Logger.Error("failed to write to timescale", zap.Error(err))
@@ -74,7 +68,6 @@ func OnMessageReceived(influxConn *influx.InfluxConn, timescaleConn *timescale.T
 			if err != nil {
 				influxConn.Logger.Error("failed to unmarshal payload", zap.String("sensor", st.Name))
 			} else {
-				influxConn.WriteRenogyChargeControllerSensorData(reading, st)
 				err := timescaleConn.WriteRenogyChargeControllerSensorData(context.TODO(), reading, st)
 				if err != nil {
 					influxConn.Logger.Error("failed to write to timescale", zap.Error(err))
