@@ -49,6 +49,14 @@ type TSL2561 struct {
 	RSSI      int     `json:"RSSI"`
 }
 
+type VEML7700 struct {
+	Name      string  `json:"name"`
+	Loc       string  `json:"loc"`
+	Timestamp int     `json:"time"`
+	Lux       float32 `json:"lux"`
+	RSSI      int     `json:"RSSI"`
+}
+
 type PMSA003I struct {
 	Name      string `json:"name"`
 	Loc       string `json:"loc"`

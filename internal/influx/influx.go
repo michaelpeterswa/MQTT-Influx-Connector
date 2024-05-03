@@ -77,7 +77,22 @@ func (conn *InfluxConn) WriteTSL2561SensorData(reading structs.TSL2561, st struc
 
 	write := conn.client.WriteAPIBlocking(conn.GetOrganization(), conn.GetBucket())
 	write.WritePoint(context.Background(), p)
+}
 
+func (conn *InfluxConn) WriteVEML7700SensorData(reading structs.VEML7700, st structs.SubTopic) {
+	p := influxdb2.NewPointWithMeasurement(conn.measurement).
+		AddTag("feeder", "MQTT-Influx-Connector").
+		AddTag("type", st.Type).
+		AddTag("location", st.Location).
+		AddTag("room", st.Room).
+		AddTag("name", st.Name).
+		AddTag("field", st.Field).
+		AddField("lux", reading.Lux).
+		AddField("rssi", reading.RSSI).
+		SetTime(time.Unix(int64(reading.Timestamp), 0))
+
+	write := conn.client.WriteAPIBlocking(conn.GetOrganization(), conn.GetBucket())
+	write.WritePoint(context.Background(), p)
 }
 
 func (conn *InfluxConn) WritePMSA003ISensorData(reading structs.PMSA003I, st structs.SubTopic) {
