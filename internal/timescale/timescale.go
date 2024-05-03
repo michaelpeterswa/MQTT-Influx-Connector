@@ -12,16 +12,19 @@ import (
 	gorenogymodbus "github.com/michaelpeterswa/go-renogy-modbus"
 )
 
-//go:embed write_bme280.sql
+//go:embed queries/write_bme280.pgsql
 var writeBME280SQL string
 
-//go:embed write_pmsa003i.sql
+//go:embed queries/write_pmsa003i.pgsql
 var writePMSA003ISQL string
 
-//go:embed write_tsl2561.sql
+//go:embed queries/write_tsl2561.pgsql
 var writeTSL2561SQL string
 
-//go:embed write_renogychargecontroller.sql
+//go:embed queries/write_veml7700.pgsql
+var writeVEML7700SQL string
+
+//go:embed queries/write_renogychargecontroller.pgsql
 var writeRenogyChargeControllerSQL string
 
 type TimescaleConn struct {
@@ -70,6 +73,26 @@ func (t *TimescaleConn) WriteTSL2561SensorData(ctx context.Context, reading stru
 	_, err := t.Conn.Exec(
 		ctx,
 		writeTSL2561SQL,
+		time.Unix(int64(reading.Timestamp), 0),
+		st.Type,
+		st.Location,
+		st.Room,
+		st.Name,
+		st.Field,
+		reading.Lux,
+		reading.RSSI,
+	)
+	if err != nil {
+		return fmt.Errorf("unable to write tsl2561 data to timescale: %w", err)
+	}
+
+	return nil
+}
+
+func (t *TimescaleConn) WriteVEML7700SensorData(ctx context.Context, reading structs.VEML7700, st structs.SubTopic) error {
+	_, err := t.Conn.Exec(
+		ctx,
+		writeVEML7700SQL,
 		time.Unix(int64(reading.Timestamp), 0),
 		st.Type,
 		st.Location,

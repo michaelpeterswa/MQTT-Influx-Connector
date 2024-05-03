@@ -51,6 +51,17 @@ func OnMessageReceived(influxConn *influx.InfluxConn, timescaleConn *timescale.T
 					influxConn.Logger.Error("failed to write to timescale", zap.Error(err))
 				}
 			}
+		case "veml7700":
+			var reading structs.VEML7700
+			err := json.Unmarshal(message.Payload(), &reading)
+			if err != nil {
+				influxConn.Logger.Error("failed to unmarshal payload", zap.String("sensor", st.Name))
+			} else {
+				err := timescaleConn.WriteVEML7700SensorData(context.TODO(), reading, st)
+				if err != nil {
+					influxConn.Logger.Error("failed to write to timescale", zap.Error(err))
+				}
+			}
 		case "pmsa003i":
 			var reading structs.PMSA003I
 			err := json.Unmarshal(message.Payload(), &reading)
