@@ -34,7 +34,7 @@ INSERT INTO
         total_discharging_amp_hours,
         cumulative_power_generation,
         cumulative_power_consumption,
-        street_light_stauts,
+        street_light_status,
         street_light_brightness,
         charging_state,
         controller_faults,
